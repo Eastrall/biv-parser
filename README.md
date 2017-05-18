@@ -2,7 +2,9 @@
 
 **B**lock **I**nstruction **V**ariable parser
 
-The purpose of this repository is to create an algorithm that parses to following file structure:
+## Introduction
+
+The purpose of this repository is to create an algorithm using C#.NET that parses to following file structure:
 
 ```
 BlockA
