@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace BIV.Parser.Core
 {
     public class Instruction : IStatement
     {
+        private ICollection<object> _parameters;
+
         public string Name { get; private set; }
+
+        public IReadOnlyCollection<object> Parameters
+        {
+            get { return this._parameters as IReadOnlyCollection<object>; }
+        }
 
         public StatementType Type
         {
@@ -16,37 +20,7 @@ namespace BIV.Parser.Core
 
         public Instruction()
         {
-
-        }
-    }
-
-    public class Block : IStatement
-    {
-        public string Name { get; private set; }
-
-        public StatementType Type
-        {
-            get { return StatementType.Block; }
-        }
-
-        public ICollection<IStatement> Statements { get; private set; }
-
-        public Block this[string blockName]
-        {
-            get { return this.GetBlockByName(blockName); }
-        }
-
-        public Block()
-        {
-            this.Statements = new List<IStatement>();
-        }
-
-        public Block GetBlockByName(string name)
-        {
-            return (from x in this.Statements
-                    where x.Name.ToLower() == name.ToLower()
-                    where x.Type == StatementType.Block
-                    select x).FirstOrDefault() as Block;
+            this._parameters = new List<object>();
         }
     }
 }
