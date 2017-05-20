@@ -36,11 +36,28 @@ namespace BIV.Parser.Core
             {
                 string line = this.fileContent[i];
 
-                if (line.StartsWith(SingleLineComment))
+                if (string.IsNullOrEmpty(line) || line.StartsWith(SingleLineComment))
                     continue;
 
                 if (line.Contains(SingleLineComment))
                     line = line.Remove(line.IndexOf(SingleLineComment));
+
+                if (line.Contains(MultiLineCommentBegin))
+                {
+                    int tmp = i;
+
+                    this.fileContent[tmp++] = line.Remove(line.IndexOf(MultiLineCommentBegin)).Trim();
+                    while (!this.fileContent[tmp].Contains(MultiLineCommentEnd))
+                    {
+                        this.fileContent[tmp++] = string.Empty;
+                        continue;
+                    }
+                    int removeStartIndex = this.fileContent[tmp].IndexOf(MultiLineCommentEnd) + MultiLineCommentEnd.Length;
+                    this.fileContent[tmp] = this.fileContent[tmp].Substring(removeStartIndex).Trim();
+                    line = this.fileContent[i];
+                }
+
+                Console.WriteLine(line);
             }
         }
 
