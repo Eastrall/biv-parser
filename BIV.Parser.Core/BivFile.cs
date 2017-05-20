@@ -34,28 +34,13 @@ namespace BIV.Parser.Core
 
             for (int i = 0; i < this.fileContent.Length; i++)
             {
-                string line = this.fileContent[i];
-
-                if (string.IsNullOrEmpty(line) || line.StartsWith(SingleLineComment))
+                if (this.IngoreComments(i))
                     continue;
 
-                if (line.Contains(SingleLineComment))
-                    line = line.Remove(line.IndexOf(SingleLineComment));
+                string line = this.fileContent[i];
 
-                if (line.Contains(MultiLineCommentBegin))
-                {
-                    int tmp = i;
-
-                    this.fileContent[tmp++] = line.Remove(line.IndexOf(MultiLineCommentBegin)).Trim();
-                    while (!this.fileContent[tmp].Contains(MultiLineCommentEnd))
-                    {
-                        this.fileContent[tmp++] = string.Empty;
-                        continue;
-                    }
-                    int removeStartIndex = this.fileContent[tmp].IndexOf(MultiLineCommentEnd) + MultiLineCommentEnd.Length;
-                    this.fileContent[tmp] = this.fileContent[tmp].Substring(removeStartIndex).Trim();
-                    line = this.fileContent[i];
-                }
+                if (string.IsNullOrEmpty(line))
+                    continue;
 
                 Console.WriteLine(line);
             }
@@ -67,6 +52,33 @@ namespace BIV.Parser.Core
             using (var reader = new StreamReader(fileStream))
                 this.fileContent = (from x in reader.ReadToEnd().Split(SplitCharacters, StringSplitOptions.RemoveEmptyEntries)
                                     select x.Trim()).ToArray();
+        }
+
+        private bool IngoreComments(int currentIndex)
+        {
+            string line = this.fileContent[currentIndex];
+
+            if (string.IsNullOrEmpty(line) || line.StartsWith(SingleLineComment))
+                return true;
+
+            if (line.Contains(SingleLineComment))
+                this.fileContent[currentIndex] = line.Remove(line.IndexOf(SingleLineComment));
+
+            if (line.Contains(MultiLineCommentBegin))
+            {
+                int tmp = currentIndex;
+
+                this.fileContent[tmp++] = line.Remove(line.IndexOf(MultiLineCommentBegin)).Trim();
+                while (!this.fileContent[tmp].Contains(MultiLineCommentEnd))
+                {
+                    this.fileContent[tmp++] = string.Empty;
+                    continue;
+                }
+                int removeStartIndex = this.fileContent[tmp].IndexOf(MultiLineCommentEnd) + MultiLineCommentEnd.Length;
+                this.fileContent[tmp] = this.fileContent[tmp].Substring(removeStartIndex).Trim();
+            }
+
+            return false;
         }
 
         public void Dispose()
