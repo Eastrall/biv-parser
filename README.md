@@ -12,6 +12,11 @@ BlockA
   m_variableA = 20;
   m_variableB = "Hello world!";
   InstructionA(string_param, 12);
+  OtherInstruction
+  (
+    "Parameter",
+    0
+  );
   
   BlockB
   {
