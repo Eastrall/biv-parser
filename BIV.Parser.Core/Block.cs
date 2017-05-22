@@ -3,16 +3,21 @@ using System.Linq;
 
 namespace BIV.Parser.Core
 {
-    public class Block : IStatement
+    public class Block : IStatement, IParsableStatement
     {
-        public string Name { get; private set; }
+        private ICollection<IStatement> _statements;
+
+        public string Name { get; set; }
 
         public StatementType Type
         {
             get { return StatementType.Block; }
         }
 
-        public ICollection<IStatement> Statements { get; private set; }
+        public IReadOnlyCollection<IStatement> Statements
+        {
+            get { return this._statements as IReadOnlyCollection<IStatement>; }
+        }
 
         public Block this[string blockName]
         {
@@ -20,8 +25,14 @@ namespace BIV.Parser.Core
         }
 
         public Block()
+            : this(string.Empty)
         {
-            this.Statements = new List<IStatement>();
+        }
+
+        public Block(string name)
+        {
+            this.Name = name;
+            this._statements = new List<IStatement>();
         }
 
         public Block GetBlockByName(string name)
@@ -30,6 +41,11 @@ namespace BIV.Parser.Core
                     where x.Name.ToLower() == name.ToLower()
                     where x.Type == StatementType.Block
                     select x).FirstOrDefault() as Block;
+        }
+
+        public void Parse(string[] fileContent, ref int currentIndex)
+        {
+            
         }
     }
 }

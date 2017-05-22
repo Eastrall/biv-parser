@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BIV.Parser.Core
 {
@@ -13,72 +14,79 @@ namespace BIV.Parser.Core
         private const string MultiLineCommentEnd = "*/";
         private readonly char[] SplitCharacters = new char[] { '\n', '\r' };
 
-        private string filePath;
-        private string[] fileContent;
+        private string _filePath;
+        private IEnumerable<string> _tokens;
+        private ICollection<IStatement> _statements;
 
-        public ICollection<IStatement> Statements { get; private set; }
+        public IReadOnlyCollection<IStatement> Statements
+        {
+            get { return this._statements as IReadOnlyCollection<IStatement>; }
+        }
 
         public BivFile(string filePath)
         {
-            this.filePath = filePath;
-
-            this.Statements = new List<IStatement>();
+            this._filePath = filePath;
+            this._statements = new List<IStatement>();
         }
 
         public void Parse()
         {
             this.ReadFile();
-
-            if (this.fileContent.Length <= 0)
-                return;
-
-            for (int i = 0; i < this.fileContent.Length; i++)
-            {
-                if (this.IngoreComments(i))
-                    continue;
-
-                string line = this.fileContent[i];
-
-                if (string.IsNullOrEmpty(line))
-                    continue;
-
-                Console.WriteLine(line);
-            }
         }
 
         private void ReadFile()
         {
-            using (var fileStream = new FileStream(this.filePath, FileMode.Open, FileAccess.Read))
+            using (var fileStream = new FileStream(this._filePath, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(fileStream))
-                this.fileContent = (from x in reader.ReadToEnd().Split(SplitCharacters, StringSplitOptions.RemoveEmptyEntries)
-                                    select x.Trim()).ToArray();
+            {
+                string fileContent = reader.ReadToEnd();
+                this._tokens = this.IgnoreComments(fileContent);
+            }
+            
+            string[] parts = Regex.Split(string.Join("", this._tokens), @"([(){}=,;\n\r ])");
+
+            this._tokens = from x in parts
+                          let y = x.Trim()
+                          where !string.IsNullOrEmpty(y)
+                          select y;
+
+            foreach (var token in this._tokens)
+                Console.WriteLine(token.Trim());
         }
 
-        private bool IngoreComments(int currentIndex)
+        private IEnumerable<string> IgnoreComments(string fileContent)
         {
-            string line = this.fileContent[currentIndex];
+            string[] splitFileContent = fileContent.Split(SplitCharacters, StringSplitOptions.RemoveEmptyEntries);
 
-            if (string.IsNullOrEmpty(line) || line.StartsWith(SingleLineComment))
-                return true;
-
-            if (line.Contains(SingleLineComment))
-                this.fileContent[currentIndex] = line.Remove(line.IndexOf(SingleLineComment));
-
-            if (line.Contains(MultiLineCommentBegin))
+            for (int i = 0; i < splitFileContent.Length; ++i)
             {
-                int tmp = currentIndex;
+                string line = splitFileContent[i];
 
-                this.fileContent[tmp++] = line.Remove(line.IndexOf(MultiLineCommentBegin)).Trim();
-                while (!this.fileContent[tmp].Contains(MultiLineCommentEnd))
+                if (string.IsNullOrEmpty(line) || line.StartsWith(SingleLineComment))
                 {
-                    this.fileContent[tmp++] = string.Empty;
+                    splitFileContent[i] = string.Empty;
                     continue;
                 }
-                int removeStartIndex = this.fileContent[tmp].IndexOf(MultiLineCommentEnd) + MultiLineCommentEnd.Length;
-                this.fileContent[tmp] = this.fileContent[tmp].Substring(removeStartIndex).Trim();
+
+                if (line.Contains(SingleLineComment))
+                    splitFileContent[i] = line.Remove(line.IndexOf(SingleLineComment));
+
+                if (line.Contains(MultiLineCommentBegin))
+                {
+                    splitFileContent[i++] = line.Remove(line.IndexOf(MultiLineCommentBegin)).Trim();
+                    while (!splitFileContent[i].Contains(MultiLineCommentEnd))
+                    {
+                        splitFileContent[i++] = string.Empty;
+                        continue;
+                    }
+                    int removeStartIndex = splitFileContent[i].IndexOf(MultiLineCommentEnd) + MultiLineCommentEnd.Length;
+                    splitFileContent[i] = splitFileContent[i].Substring(removeStartIndex).Trim();
+                }
             }
 
-            return false;
+            return from x in splitFileContent
+                   where !string.IsNullOrEmpty(x)
+                   select x;
         }
 
         public void Dispose()

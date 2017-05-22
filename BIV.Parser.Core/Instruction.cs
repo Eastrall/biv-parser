@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BIV.Parser.Core
 {
@@ -21,6 +22,10 @@ namespace BIV.Parser.Core
         public Instruction()
         {
             this._parameters = new List<object>();
+        }
+
+        void Parse(string[] fileContent, ref int currentIndex)
+        {
         }
     }
 }

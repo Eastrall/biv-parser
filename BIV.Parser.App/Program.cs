@@ -7,12 +7,12 @@ namespace BIV.Parser.App
     {
         static void Main(string[] args)
         {
-            using (var file = new BivFile("../example.biv"))
+            using (var file = new BivFile(@"C:\Users\gomes\Documents\Project Hellion\Hellion\binary\data\res\dataSub1\character.inc"))
             {
                 file.Parse();
 
-                //foreach (var statement in file.Statements)
-                //    Display(statement);
+                foreach (var statement in file.Statements)
+                    Display(statement);
             }
 
             Console.ReadLine();
@@ -27,6 +27,7 @@ namespace BIV.Parser.App
                 case StatementType.Block:
                     var block = statement as Block;
 
+                    Console.WriteLine("[Block]: {0}", block.Name);
                     foreach (var blockStatement in block.Statements)
                         Display(blockStatement, index + 1);
                     break;
@@ -48,7 +49,7 @@ namespace BIV.Parser.App
         {
             if (branch > 0)
             {
-                Console.Write(Environment.NewLine + "|");
+                Console.Write("|");
                 for (int i = 0; i < branch; i++)
                     Console.Write("-");
                 Console.Write(" ");
