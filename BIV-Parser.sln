@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.4
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIV.Parser.Core", "BIV.Parser.Core\BIV.Parser.Core.csproj", "{BC5DED4B-2C14-4229-91E7-B987FFB27126}"
 EndProject
@@ -10,6 +10,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{283D705E-C553-468F-BB51-25F1BE79C70C}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		example.biv = example.biv
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
