@@ -7,7 +7,7 @@ namespace BIV.Parser.App
     {
         static void Main(string[] args)
         {
-            using (var file = new BivFile(@"C:\Users\gomes\Documents\Project Hellion\Hellion\binary\data\res\dataSub1\character.inc"))
+            using (var file = new BivFile(@"../example.biv"))
             {
                 file.Parse();
 

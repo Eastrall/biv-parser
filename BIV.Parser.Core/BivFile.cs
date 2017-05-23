@@ -14,6 +14,7 @@ namespace BIV.Parser.Core
         private const string MultiLineCommentEnd = "*/";
         private readonly char[] SplitCharacters = new char[] { '\n', '\r' };
 
+        private int _currentTokenIndex;
         private string _filePath;
         private IEnumerable<string> _tokens;
         private ICollection<IStatement> _statements;
@@ -25,6 +26,7 @@ namespace BIV.Parser.Core
 
         public BivFile(string filePath)
         {
+            this._currentTokenIndex = 0;
             this._filePath = filePath;
             this._statements = new List<IStatement>();
         }
@@ -34,27 +36,43 @@ namespace BIV.Parser.Core
             this.ReadFile();
         }
 
+        public string GetToken()
+        {
+            if (this._currentTokenIndex > this._tokens.Count())
+                return null;
+
+            return this._tokens.ElementAt(this._currentTokenIndex++);
+        }
+
+        public bool NextTokenIs(string token)
+        {
+            if (this._currentTokenIndex > this._tokens.Count())
+                return false;
+
+            return string.Equals(this._tokens.ElementAt(this._currentTokenIndex + 1), token, StringComparison.OrdinalIgnoreCase);
+        }
+
         private void ReadFile()
         {
             using (var fileStream = new FileStream(this._filePath, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(fileStream))
             {
                 string fileContent = reader.ReadToEnd();
-                this._tokens = this.IgnoreComments(fileContent);
+                fileContent = this.IgnoreComments(fileContent);
+                
+                string[] parts = Regex.Split(fileContent, @"([(){}=,;\n\r])");
+
+                this._tokens = from x in parts
+                               let y = x.Trim()
+                               where !string.IsNullOrEmpty(y)
+                               select y;
+
+                foreach (var token in this._tokens)
+                    Console.WriteLine(token.Trim());
             }
-            
-            string[] parts = Regex.Split(string.Join("", this._tokens), @"([(){}=,;\n\r ])");
-
-            this._tokens = from x in parts
-                          let y = x.Trim()
-                          where !string.IsNullOrEmpty(y)
-                          select y;
-
-            foreach (var token in this._tokens)
-                Console.WriteLine(token.Trim());
         }
 
-        private IEnumerable<string> IgnoreComments(string fileContent)
+        private string IgnoreComments(string fileContent)
         {
             string[] splitFileContent = fileContent.Split(SplitCharacters, StringSplitOptions.RemoveEmptyEntries);
 
@@ -84,9 +102,11 @@ namespace BIV.Parser.Core
                 }
             }
 
-            return from x in splitFileContent
-                   where !string.IsNullOrEmpty(x)
-                   select x;
+            var tokens = from x in splitFileContent
+                         where !string.IsNullOrEmpty(x)
+                         select x;
+
+            return string.Join("", tokens);
         }
 
         public void Dispose()
