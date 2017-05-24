@@ -15,10 +15,9 @@ namespace BIV.Parser.App
             {
                 file.Parse();
                 s.Stop();
-
-
-                //foreach (var statement in file.Statements)
-                //    Display(statement);
+                
+                foreach (var statement in file.Statements)
+                    Display(statement);
             }
 
             Console.WriteLine("Parsed in {0} ms", s.ElapsedMilliseconds);
