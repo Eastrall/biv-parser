@@ -11,7 +11,7 @@ namespace BIV.Parser.App
             Stopwatch s = new Stopwatch();
 
             s.Start();
-            using (var file = new BivFile(@"C:\Users\gomes\Documents\Project Hellion\Hellion\binary\data\res\dataSub1\character.inc"))
+            using (var file = new BivFile(@"../example.biv"))
             {
                 file.Parse();
                 s.Stop();
