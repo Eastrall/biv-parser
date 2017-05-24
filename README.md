@@ -65,3 +65,20 @@ Let's define these three statements:
 |-------|------|-------------|
 | Statements | `List<IStatement>` | List of the statements inside this one. (Blocks, instructions and variables) |
 | this[`string`] | `Block` | Access the block match the indexer name. |
+
+## Performance
+
+### Reading and ignore comments
+
+File size: 1MB
+Read Time: 150~200 ms
+Number of tokens: 63108
+
+## Parsing
+
+File size: 1MB
+Number of tokens: 63108
+Parse time: (xx) ms
+Number of blocks:
+Number of instructions:
+Number of variables
