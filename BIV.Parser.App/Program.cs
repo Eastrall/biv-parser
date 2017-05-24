@@ -1,5 +1,6 @@
 ﻿using BIV.Parser.Core;
 using System;
+using System.Diagnostics;
 
 namespace BIV.Parser.App
 {
@@ -7,13 +8,20 @@ namespace BIV.Parser.App
     {
         static void Main(string[] args)
         {
-            using (var file = new BivFile(@"../example.biv"))
+            Stopwatch s = new Stopwatch();
+
+            s.Start();
+            using (var file = new BivFile(@"C:\Users\gomes\Documents\Project Hellion\Hellion\binary\data\res\dataSub1\character.inc"))
             {
                 file.Parse();
+                s.Stop();
 
-                foreach (var statement in file.Statements)
-                    Display(statement);
+
+                //foreach (var statement in file.Statements)
+                //    Display(statement);
             }
+
+            Console.WriteLine("Parsed in {0} ms", s.ElapsedMilliseconds);
 
             Console.ReadLine();
         }
@@ -32,8 +40,8 @@ namespace BIV.Parser.App
                         Display(blockStatement, index + 1);
                     break;
                 case StatementType.Instruction:
-                    Console.WriteLine("[Instruction]: {0} => ", statement.Name);
-                    // Todo: display params
+                    var instruction = statement as Instruction;
+                    Console.WriteLine("[Instruction]: {0} => {1}", statement.Name, string.Join(", ", instruction.Parameters));
                     break;
                 case StatementType.Variable:
                     var variable = statement as Variable;

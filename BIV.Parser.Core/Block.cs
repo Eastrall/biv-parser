@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BIV.Parser.Core
 {
-    public class Block : IStatement, IParsableStatement
+    public class Block : IStatement, IDisposable
     {
         private ICollection<IStatement> _statements;
 
@@ -43,9 +44,15 @@ namespace BIV.Parser.Core
                     select x).FirstOrDefault() as Block;
         }
 
-        public void Parse(string[] fileContent, ref int currentIndex)
+        internal void AddStatement(IStatement statement)
         {
-            
+            this._statements.Add(statement);
+        }
+
+        public void Dispose()
+        {
+            if (this._statements.Any())
+                this._statements.Clear();
         }
     }
 }
