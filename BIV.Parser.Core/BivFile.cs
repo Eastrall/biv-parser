@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BIV.Parser.Core
@@ -34,6 +32,7 @@ namespace BIV.Parser.Core
 
         public void Parse()
         {
+            this._currentTokenIndex = 0;
             this.ReadFile();
 
             string token = null;
@@ -181,6 +180,14 @@ namespace BIV.Parser.Core
 
         public void Dispose()
         {
+            foreach (var statement in this._statements)
+            {
+                if (statement is IDisposable)
+                    (statement as IDisposable).Dispose();
+            }
+
+            this._statements.Clear();
+            this._currentTokenIndex = 0;
         }
     }
 }

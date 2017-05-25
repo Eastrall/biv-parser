@@ -38,10 +38,22 @@ namespace BIV.Parser.Core
 
         public Block GetBlockByName(string name)
         {
-            return (from x in this.Statements
-                    where x.Name.ToLower() == name.ToLower()
-                    where x.Type == StatementType.Block
-                    select x).FirstOrDefault() as Block;
+            return this.GetStatement(name, StatementType.Block) as Block;
+        }
+
+        public Instruction GetInstruction(string name)
+        {
+            return this.GetStatement(name, StatementType.Instruction) as Instruction;
+        }
+
+        public Variable GetVariable(string name)
+        {
+            return this.GetStatement(name, StatementType.Variable) as Variable;
+        }
+
+        private IStatement GetStatement(string name, StatementType type)
+        {
+            return this._statements.FirstOrDefault(x => x.Name == name && x.Type == type);
         }
 
         internal void AddStatement(IStatement statement)
