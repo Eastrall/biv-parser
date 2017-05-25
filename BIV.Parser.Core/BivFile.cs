@@ -17,7 +17,7 @@ namespace BIV.Parser.Core
 
         private int _currentTokenIndex;
         private string _filePath;
-        private IEnumerable<string> _tokens;
+        private string[] _tokens;
         private ICollection<IStatement> _statements;
 
         public IReadOnlyCollection<IStatement> Statements
@@ -53,7 +53,7 @@ namespace BIV.Parser.Core
             if (this._currentTokenIndex + 1 > this._tokens.Count())
                 return null;
 
-            return this._tokens.ElementAt(this._currentTokenIndex++);
+            return this._tokens[this._currentTokenIndex++];
         }
 
         public string GetPreviousToken()
@@ -61,7 +61,7 @@ namespace BIV.Parser.Core
             if (this._currentTokenIndex <= 0)
                 return null;
 
-            return this._tokens.ElementAt(this._currentTokenIndex - 1);
+            return this._tokens[this._currentTokenIndex - 1];
         }
 
         public bool NextTokenIs(string token)
@@ -69,7 +69,7 @@ namespace BIV.Parser.Core
             if (this._currentTokenIndex > this._tokens.Count())
                 return false;
 
-            return string.Equals(this._tokens.ElementAt(this._currentTokenIndex + 1), token, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(this._tokens[this._currentTokenIndex + 1], token, StringComparison.OrdinalIgnoreCase);
         }
 
         private void ReadFile()
@@ -114,23 +114,25 @@ namespace BIV.Parser.Core
 
                 string[] parts = Regex.Split(fileContent, @"([(){}=,;\n\r])");
 
-                this._tokens = from x in parts
-                               let y = x.Trim()
-                               where !string.IsNullOrEmpty(y)
-                               select y;
+                this._tokens = (from x in parts
+                                let y = x.Trim()
+                                where !string.IsNullOrEmpty(y)
+                                select y).ToArray();
             }
         }
 
         private Block ParseBlock()
         {
+            string token = null;
             var block = new Block()
             {
                 Name = this._tokens.ElementAt(this._currentTokenIndex - 2)
             };
-            string token = null;
 
             while ((token = this.GetToken()) != "}")
             {
+                if (token == null)
+                    break;
                 if (token == "{")
                     block.AddStatement(this.ParseBlock());
                 else if (token == "(")
@@ -149,14 +151,18 @@ namespace BIV.Parser.Core
             {
                 Name = this._tokens.ElementAt(this._currentTokenIndex - 2)
             };
+
+            if (instruction.Name == "SetOutput")
+            {
+            }
             
             while ((parameter = this.GetToken()) != ")")
                 instruction.AddParameter(parameter);
 
             string endDelimiter = this.GetToken();
 
-            if (endDelimiter != ";")
-                throw new InvalidDataException("Invalid instruction format. Missing ';' for instruction " + instruction.Name);
+            //if (endDelimiter != ";")
+            //    throw new InvalidDataException("Invalid instruction format. Missing ';' for instruction " + instruction.Name);
 
             return instruction;
         }

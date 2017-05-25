@@ -70,23 +70,15 @@ Let's define these three statements:
 
 ### Reading and ignore comments
 
-File size: 1MB
-
-Read Time: 150~200 ms
-
-Number of tokens: 63108
+- File size: 1MB
+- Read Time: 150~200 ms
+- Number of tokens: 63108
 
 ### Parsing
 
-File size: 1MB
-
-Number of tokens: 63108
-
-Parse time: (xx) ms
-
-Number of blocks: xx
-
-Number of instructions: xx
-
-Number of variables: xx
-
+- File size: 1MB
+- Number of tokens: 63108
+- Parse time: 500~700 ms
+- Number of blocks: 1130
+- Number of instructions: 6503
+- Number of variables: 0
